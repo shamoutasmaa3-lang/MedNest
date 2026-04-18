@@ -1,0 +1,94 @@
+
+.body {
+  height: 100vh;
+  background: #f9e8e8;
+ display: flex;
+  justify-content:center;
+  flex-direction: column;
+  align-items:center;
+  text-align: center;
+  font-size: 30px;
+  color:#660000;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.warning-message {
+  background: white;
+  width: 600px;
+  padding: 40px;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(255, 0, 0, 0.15);
+  border: 2px solid #ff4d4d;
+  margin: 29px;
+ 
+  
+}
+
+.analize {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+
+.wait img {
+  width: 80px;  
+  height: auto;
+  animation: float 1.5s infinite ease-in-out;
+ 
+}
+
+.warning-message h2 {
+  color: #b30000;
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+
+.warning-message h4 {
+  color: #4d0000;
+  font-size: 16px;
+  margin-bottom: 20px;
+  font-weight: normal;
+
+}
+
+
+.contener {
+  background: #ffe5e5;
+  padding: 20px;
+  border-radius: 15px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+ 
+}
+
+
+.contener h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #660000;
+}
+
+
+.button button {
+  margin-top: 25px;
+  background: #cc0000;
+  color: white;
+  padding: 14px 35px;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+
+.button button:hover {
+  background: #990000;
+
+}
