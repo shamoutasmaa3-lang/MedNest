@@ -8,6 +8,9 @@ use App\Models\User;
 
 class UserSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run()
     {
         // Patient
@@ -16,7 +19,7 @@ class UserSeeder extends Seeder
             'email' => 'patient@example.com',
             'password' => Hash::make('password'),
             'role' => 'patient',
-            'addresss' => 'Damascus',
+            'address' => 'Damascus',
         ]);
 
         // Doctor
@@ -25,7 +28,7 @@ class UserSeeder extends Seeder
             'email' => 'doctor@example.com',
             'password' => Hash::make('password'),
             'role' => 'doctor',
-            'addresss' => 'Damascus',
+            'address' => 'Damascus',
         ]);
 
         // Pharmacist
@@ -34,16 +37,25 @@ class UserSeeder extends Seeder
             'email' => 'pharmacist@example.com',
             'password' => Hash::make('password'),
             'role' => 'pharmacist',
-            'addresss' => 'Damascus',
+            'address' => 'Damascus',
         ]);
 
         // Admin
         User::create([
-            'name' => 'Admin',
+            'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
-            'addresss' => 'Damascus',
+            'address' => 'Damascus',
+        ]);
+
+        // Delivery (مندوب توصيل)
+        User::create([
+            'name' => 'Khalid Delivery',
+            'email' => 'delivery@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'delivery',
+            'address' => 'Damascus',
         ]);
     }
 }
