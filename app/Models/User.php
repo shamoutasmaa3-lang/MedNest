@@ -14,13 +14,13 @@ class User extends Authenticatable
 
     protected $guarded = ['id'];
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',        
-        'addresss',   
-    ];
+   protected $fillable = [
+    'name',
+    'email',
+    'password',
+    'role',
+    'address',   
+];
 
     protected $hidden = [
         'password',
