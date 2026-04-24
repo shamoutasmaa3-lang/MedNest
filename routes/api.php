@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // User management
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/logout', [UserController::class, 'logout']);
+    Route::post('/logout-all', [UserController::class, 'logoutAll']);
 
     // Cart management
     Route::get('/cart', [CartController::class, 'index']);

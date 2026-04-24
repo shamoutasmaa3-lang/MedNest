@@ -24,15 +24,15 @@ class UserController extends Controller
                 'regex:/[0-9]/',         // رقم
                 'regex:/[@$!%*#?&]/',    // رمز خاص
             ],
-            'address'   => 'required|string|min:10', 
+            'address'   => 'required|string|min:10',
         ]);
 
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'address'  => $request->address,   
-            'role'     => 'patient',           
+            'address'  => $request->address,
+            'role'     => 'patient',
         ]);
 
         return response()->json([
@@ -41,7 +41,7 @@ class UserController extends Controller
         ], 201);
     }
 
-   
+
     public function login(Request $request)
     {
         $request->validate([
@@ -72,5 +72,10 @@ class UserController extends Controller
     public function getUser(Request $request)
     {
         return response()->json($request->user());
+    }
+    public function logoutAll(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        return response()->json(['message' => 'Logged out from all devices']);
     }
 }
