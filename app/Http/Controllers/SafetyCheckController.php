@@ -3,6 +3,9 @@ namespace App\Http\Controllers;
 use App\Services\DrugInteractionService;
 use Illuminate\Http\Request;
 use App\Models\Medicine;
+use App\Notifications\SafetyCheckResult;
+use App\Models\User;
+
 class SafetyCheckController extends Controller
 {
     protected $interactionService;
@@ -17,6 +20,13 @@ class SafetyCheckController extends Controller
         $medicineIds = $request->medicine_ids;
         $interactions = $this->interactionService->checkInteractions($medicineIds);
         $hasSevere = $this->interactionService->hasSevereInteraction($medicineIds);
+
+        if ($request->user_id) {
+        $user = User::find($request->user_id);
+        if ($user) {
+            $user->notify(new SafetyCheckResult($hasSevere, $interactions));
+        }
+    }
         return response()->json([
             'status' => $hasSevere ? 'danger' : 'safe',
             'message' => $hasSevere 
