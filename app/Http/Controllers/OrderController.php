@@ -8,6 +8,9 @@ use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\OrderAccepted;
+use App\Notifications\OrderRejected;
+
 
 class OrderController extends Controller
 {
@@ -169,6 +172,34 @@ class OrderController extends Controller
         }
         $order->status = 'verified';
         $order->save();
+        $order->user->notify(new OrderAccepted($order));
         return response()->json(['message' => 'Order verified successfully', 'order' => $order]);
     }
+    public function reject(Request $request, $id)
+{
+    $request->validate([
+        'reason' => 'nullable|string|max:255',
+    ]);
+
+    $order = Order::with('user')->findOrFail($id);
+
+    if ($order->status !== 'pending') {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Order cannot be rejected because its status is ' . $order->status
+        ], 400);
+    }
+
+    $order->status = 'rejected';
+    $order->save();
+
+    $order->user->notify(new OrderRejected($order, $request->reason));
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Order rejected successfully',
+        'order' => $order
+    ]);
+}
+
 }
