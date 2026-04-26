@@ -3,52 +3,35 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class SafetyCheckResult extends Notification
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
+    protected $hasSevere;
+    protected $interactions;
+
+    public function __construct($hasSevere, $interactions)
     {
-        //
+        $this->hasSevere = $hasSevere;
+        $this->interactions = $interactions;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
+    public function via($notifiable)
     {
-        return ['mail'];
+        return ['database'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
+    public function toDatabase($notifiable)
     {
         return [
-            //
+            'title' => $this->hasSevere ? 'Dangerous Drug Interaction' : 'Safety Check Result',
+            'message' => $this->hasSevere
+                ? 'Serious drug interactions detected in your medicines.'
+                : 'No serious interactions found in your medicines.',
+            'has_severe' => $this->hasSevere,
+            'interactions' => $this->interactions,
         ];
     }
 }
