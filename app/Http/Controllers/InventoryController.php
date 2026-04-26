@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Stock;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Notifications\LowStockAlert;
 
 class InventoryController extends Controller
 {
@@ -19,6 +21,15 @@ class InventoryController extends Controller
         $lowStockItems = $stocks->filter(function ($stock) use ($lowStockThreshold) {
             return $stock->quantity < $lowStockThreshold;
         });
+        if ($lowStockItems->isNotEmpty()) {
+        $pharmacists = User::where('role', 'pharmacist')->get();
+
+        foreach ($lowStockItems as $stock) {
+            foreach ($pharmacists as $pharmacist) {
+                $pharmacist->notify(new LowStockAlert($stock));
+            }
+        }
+    }
 
         return response()->json([
             'status' => 'success',
