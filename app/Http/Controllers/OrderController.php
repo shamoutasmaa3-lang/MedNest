@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\OrderAccepted;
 use App\Notifications\OrderRejected;
+use App\Models\Recommendation;
+use App\Models\Stock;
+use App\Models\User;
+use App\Notifications\LowStockAlert;
+use App\Services\RecommendationService;
 
 
 class OrderController extends Controller
@@ -110,11 +115,10 @@ class OrderController extends Controller
         ]);
     }
     
-    public function dispense($id)
+   public function dispense($id)
 {
     $order = Order::with('items.medicine')->findOrFail($id);
 
-    // Check order status
     if (!in_array($order->status, ['pending', 'verified'])) {
         return response()->json([
             'status' => 'error',
@@ -125,25 +129,28 @@ class OrderController extends Controller
     DB::beginTransaction();
 
     try {
+
         foreach ($order->items as $item) {
-            $stock = \App\Models\Stock::where('medicine_id', $item->medicine_id)->lockForUpdate()->first();
+
+            $stock = Stock::where('medicine_id', $item->medicine_id)->first();
 
             if (!$stock) {
-                throw new \Exception("Stock record not found for medicine ID: {$item->medicine_id}");
+                throw new \Exception("No stock found for this medicine");
             }
 
             if ($stock->quantity < $item->quantity) {
-                throw new \Exception(
-                    "Insufficient stock for medicine: {$item->medicine->name}. Available: {$stock->quantity}, Required: {$item->quantity}"
-                );
+                throw new \Exception("Not enough stock");
             }
 
-            // Deduct stock
             $stock->quantity -= $item->quantity;
             $stock->save();
-        }
 
-        // Update order status
+            if ($stock->quantity < $stock->min_quantity) {
+                User::where('role', 'pharmacist')->each(
+                    fn($p) => $p->notify(new LowStockAlert($stock))
+                );
+            }
+        }
         $order->status = 'dispensed';
         $order->save();
 
@@ -164,6 +171,7 @@ class OrderController extends Controller
         ], 500);
     }
 }
+
     public function verify($id)
     {
         $order = Order::findOrFail($id);
@@ -201,5 +209,50 @@ class OrderController extends Controller
         'order' => $order
     ]);
 }
+public function generateUsageRecommendations(Request $request, RecommendationService $service)
+{
+    $user = $request->user();
+
+    $recommendations = $service->getUsageRecommendations($user);
+
+    Recommendation::create([
+        'user_id' => $user->id,
+        'type' => 'usage',
+        'message' => 'Based on your recent orders, here are recommended medicines.',
+        'data' => ['recommendations' => $recommendations],
+    ]);
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $recommendations,
+    ]);
+
+}
+public function dosageReminder(Request $request, RecommendationService $service)
+{
+    $user = $request->user();
+
+    $reminders = $service->getDosageReminder($user);
+
+    if ($reminders->isEmpty()) {
+        return response()->json([
+            'status' => 'no-reminders',
+            'message' => 'No dosage reminders available.',
+        ]);
+    }
+
+    Recommendation::create([
+        'user_id' => $user->id,
+        'type' => 'dosage',
+        'message' => 'Dosage reminder for frequently used medicines.',
+        'data' => ['reminders' => $reminders],
+    ]);
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $reminders,
+    ]);
+}
+
 
 }
