@@ -79,5 +79,21 @@ public function reply(Request $request, $id)
     ]);
 }
 
+public function pharmacistConsultations(Request $request)
+{
+    if ($request->user()->role !== 'pharmacist') {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+    $consultations = Consultation::whereNull('pharmacist_id')
+        ->orWhere('pharmacist_id', $request->user()->id)
+        ->with('messages')
+        ->latest()
+        ->get();
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $consultations
+    ]);
+}
 
 }
