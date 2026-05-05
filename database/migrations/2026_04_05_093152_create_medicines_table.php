@@ -6,12 +6,8 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-       
+    
+   public function up(): void
 {
     Schema::create('medicines', function (Blueprint $table) {
         $table->id(); // medicine_id
@@ -20,10 +16,12 @@ return new class extends Migration
         $table->string('category');
         $table->boolean('requires_prescription')->default(false);
         $table->decimal('price', 10, 2);
+        $table->string('active_ingredient')->nullable();
+        $table->string('manufacturer')->nullable();
         $table->timestamps();
     });
 }
-}
+
    public function down()
 {
     Schema::dropIfExists('medicines');

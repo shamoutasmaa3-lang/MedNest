@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class MedicineController extends Controller
 {
-    // إضافة دواء جديد
+   
     public function store(Request $request)
     {
         $request->validate([

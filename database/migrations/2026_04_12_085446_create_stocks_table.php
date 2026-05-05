@@ -15,6 +15,7 @@ return new class extends Migration
         $table->id();
         $table->foreignId('medicine_id')->constrained()->onDelete('cascade');
         $table->integer('quantity')->default(0);
+        $table->integer('min_quantity')->default(0);
         $table->date('expiration_date')->nullable();
         $table->string('location', 100)->nullable(); // موقع التخزين (رف، خزانة...)
         $table->timestamps();

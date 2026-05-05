@@ -137,7 +137,7 @@ class PrescriptionController extends Controller
                     'id'           => $prescription->id,
                     'doctor_name'  => $prescription->doctor->name ?? 'غير معروف',
                     'status'       => $prescription->status,
-                    'file'         => $prescription->file,
+                    'image_path'   => $prescription->image_path,
                     'created_at'   => $prescription->created_at,
                     'medicines'    => $prescription->medicines->map(function ($medicine) {
                         return [
@@ -155,6 +155,7 @@ class PrescriptionController extends Controller
     /**
      * إنشاء وصفة إلكترونية من قبل الطبيب (بدون رفع ملف)
      */
+   
     public function storeDoctorPrescription(Request $request)
     {
         $request->validate([
@@ -163,16 +164,12 @@ class PrescriptionController extends Controller
             'medicines.*.medicine_id' => 'required|exists:medicines,id',
             'medicines.*.dosage'      => 'required|string|max:100',
             'medicines.*.duration'    => 'required|string|max:100',
-            'notes'      => 'nullable|string',
+            'fhir_data'  => 'nullable|array',
         ]);
 
         $doctorId = Auth::id();
 
-        $patient = User::findOrFail($request->patient_id);
-        if ($patient->role !== 'patient') {
-            return response()->json(['error' => 'The selected user is not a patient'], 400);
-        }
-
+        // توقيع رقمي
         $signatureData = $doctorId . $request->patient_id . now()->timestamp;
         $digitalSignature = hash_hmac('sha256', $signatureData, config('app.key'));
 
@@ -182,9 +179,16 @@ class PrescriptionController extends Controller
             $prescription = Prescription::create([
                 'doctor_id'         => $doctorId,
                 'patient_id'        => $request->patient_id,
-                'digital_signature' => $digitalSignature,
+
+                // دمج FHIR + التوقيع الرقمي
+                'digital_signature' => json_encode([
+                    'signature' => $digitalSignature,
+                    'fhir'      => $request->fhir_data
+                ]),
+
                 'status'            => 'pending',
-                'file'              => null,
+                'image_path'        => null,
+                'fhir_data'         => $request->fhir_data,
             ]);
 
             foreach ($request->medicines as $medicine) {
@@ -201,6 +205,7 @@ class PrescriptionController extends Controller
                 'message' => 'Electronic prescription issued successfully',
                 'data'    => $prescription->load('medicines', 'doctor', 'patient'),
             ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -209,7 +214,6 @@ class PrescriptionController extends Controller
             ], 500);
         }
     }
-
     /**
      * جلب الوصفات التي كتبها الطبيب الحالي
      */
@@ -225,6 +229,50 @@ class PrescriptionController extends Controller
         return response()->json([
             'status' => 'success',
             'data'   => $prescriptions,
+        ]);
+    }
+    public function pharmacistPrescriptions()
+{
+    $pharmacist = Auth::user();
+
+    if ($pharmacist->role !== 'pharmacist') {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    $prescriptions = Prescription::where('doctor_id', $pharmacist->id)
+        ->orWhere('status', 'pending')
+        ->with('patient')
+        ->latest()
+        ->get();
+
+    return response()->json($prescriptions);
+}
+
+    public function review(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:verified,rejected',
+            'notes'  => 'nullable|string',
+        ]);
+
+        $pharmacist = Auth::user();
+
+        if ($pharmacist->role !== 'pharmacist') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $prescription = Prescription::findOrFail($id);
+
+        $prescription->pharmacist_id   = $pharmacist->id;
+        $prescription->pharmacist_notes = $request->notes;
+        $prescription->status           = $request->status;
+        $prescription->review_date      = now();
+
+        $prescription->save();
+
+        return response()->json([
+            'message' => 'Prescription reviewed successfully',
+            'data'    => $prescription->load('doctor', 'patient', 'pharmacist'),
         ]);
     }
 }
