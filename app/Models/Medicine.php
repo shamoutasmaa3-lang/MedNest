@@ -18,9 +18,10 @@ class Medicine extends Model
         'active_ingredient',
         'manufacturer'
     ];
+
     public function cart()
     {
-    return $this->hasMany(Cart::class);
+        return $this->hasMany(Cart::class);
     }
 
     public function prescriptions()

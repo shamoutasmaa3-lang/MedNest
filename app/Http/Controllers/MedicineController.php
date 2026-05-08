@@ -18,6 +18,9 @@ class MedicineController extends Controller
             'manufacturer'          => 'nullable|string',
             'category'              => 'nullable|string',
             'requires_prescription' => 'required|boolean',
+            // ✅ NEW: expiration date and batch number
+            'expiration_date'       => 'nullable|date|after:today',
+            'batch_number'          => 'nullable|string|max:50',
         ]);
 
         $medicine = Medicine::create($request->all());

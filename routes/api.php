@@ -12,9 +12,10 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RecommendationController;
 use Illuminate\Http\Request;
+
 // ==================== Public Routes (No Authentication) ====================
 Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']); 
+Route::post('/login', [UserController::class, 'login']);
 
 // ==================== Authenticated Routes (Require Token) ====================
 Route::middleware('auth:sanctum')->group(function () {
@@ -24,21 +25,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout-all', [UserController::class, 'logoutAll']);
     Route::post('/safety-check', [SafetyCheckController::class, 'check']);
 
-    //recommendations
+    // Recommendations
     Route::get('/recommendations/usage', [OrderController::class, 'generateUsageRecommendations']);
     Route::get('/recommendations/dosage', [OrderController::class, 'dosageReminder']);
     Route::get('/recommendations', [RecommendationController::class, 'index']);
     Route::post('/recommendations/{id}/read', [RecommendationController::class, 'markAsRead']);
-    //notifications
+
+    // Notifications (using NotificationController)
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::get('/notifications/unread', [NotificationController::class, 'unread']);
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
-    
 
-    //consultations
+    // Consultations
     Route::post('/consultations', [ConsultationController::class, 'createConsultation']);
     Route::get('/consultations', [ConsultationController::class, 'patientConsultations']);
+
     // Cart management
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart/items', [CartController::class, 'addItem']);
@@ -52,13 +54,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Prescriptions (patient)
     Route::get('/patient/prescriptions', [PrescriptionController::class, 'patientPrescriptions']);
     Route::post('/prescriptions/upload', [PrescriptionController::class, 'upload']);
-    //Medicine show(patient)
-    Route::get('/medicines', [MedicineController::class,'index']);
+
+    // Medicine show (patient)
+    Route::get('/medicines', [MedicineController::class, 'index']);
+
     // Doctor-only routes
     Route::middleware('role:doctor')->group(function () {
-      
-    Route::post('/doctor/prescriptions', [PrescriptionController::class, 'storeDoctorPrescription']);
-    Route::get('/doctor/prescriptions', [PrescriptionController::class, 'doctorPrescriptions']);
+        Route::post('/doctor/prescriptions', [PrescriptionController::class, 'storeDoctorPrescription']);
+        Route::get('/doctor/prescriptions', [PrescriptionController::class, 'doctorPrescriptions']);
     });
 
     // Pharmacist-only routes
@@ -73,5 +76,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/pharmacist/prescriptions/{id}/review', [PrescriptionController::class, 'review']);
         Route::get('/pharmacist/prescriptions', [PrescriptionController::class, 'pharmacistPrescriptions']);
         Route::post('/medicines', [MedicineController::class, 'store']);
+        // ✅ إضافة المسار الجديد للأدوية المنتهية صلاحيتها
+        Route::get('/pharmacist/inventory/expiring', [InventoryController::class, 'expiringMedicines']);
     });
+
+    // Signature verification for prescriptions (requires pharmacist, separate middleware)
+    Route::get('/pharmacist/prescriptions/{id}/verify-signature', [PrescriptionController::class, 'verifyPrescriptionSignature'])
+        ->middleware('auth:sanctum', 'role:pharmacist');
 });
