@@ -9,6 +9,7 @@ use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RecommendationController;
 use Illuminate\Http\Request;
 // ==================== Public Routes (No Authentication) ====================
@@ -29,12 +30,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/recommendations', [RecommendationController::class, 'index']);
     Route::post('/recommendations/{id}/read', [RecommendationController::class, 'markAsRead']);
     //notifications
-    Route::get('/notifications', function (Request $request) {
-    return response()->json($request->user()->notifications);
-  });
-    Route::get('/notifications/unread', function (Request $request) {
-    return response()->json($request->user()->unreadNotifications);
-   });
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread', [NotificationController::class, 'unread']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    
+
     //consultations
     Route::post('/consultations', [ConsultationController::class, 'createConsultation']);
     Route::get('/consultations', [ConsultationController::class, 'patientConsultations']);
