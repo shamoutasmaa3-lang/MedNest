@@ -18,8 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             MedicineSeeder::class,
+            StockSeeder::class,
             DrugInteractionSeeder::class,
             PrescriptionSeeder::class,
-        ]);
+           ]);
     }
 }
