@@ -16,7 +16,9 @@ class Medicine extends Model
         'requires_prescription',
         'price',
         'active_ingredient',
-        'manufacturer'
+        'manufacturer',
+        'image'
+        
     ];
 
     public function cart()
