@@ -18,7 +18,6 @@ class Medicine extends Model
         'active_ingredient',
         'manufacturer',
         'image'
-        
     ];
 
     public function cart()

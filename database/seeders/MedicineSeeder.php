@@ -32,7 +32,7 @@ class MedicineSeeder extends Seeder
             ['name' => 'Levofloxacin 500mg', 'description' => 'Broad-spectrum antibiotic', 'category' => 'Antibiotics', 'requires_prescription' => true, 'price' => 28000],
             ['name' => 'Metronidazole 500mg', 'description' => 'Antibiotic for anaerobic bacteria and parasites', 'category' => 'Antibiotics', 'requires_prescription' => true, 'price' => 10000],
             ['name' => 'Clarithromycin 500mg', 'description' => 'Antibiotic for stomach and respiratory infections', 'category' => 'Antibiotics', 'requires_prescription' => true, 'price' => 24000],
-            ['name' => 'Amoxicillin/Clavulanate 625mg', 'description' => 'Broad-spectrum antibiotic with inhibitor', 'category' => 'Antibiotics', 'requires_prescription' => true, 'price' => 20000],
+            ['name' => 'Amoxicillin_Clavulanate 625mg', 'description' => 'Broad-spectrum antibiotic with inhibitor', 'category' => 'Antibiotics', 'requires_prescription' => true, 'price' => 20000],
             ['name' => 'Cefixime 200mg', 'description' => 'Antibiotic for ear and throat infections', 'category' => 'Antibiotics', 'requires_prescription' => true, 'price' => 19000],
             ['name' => 'Erythromycin 250mg', 'description' => 'Penicillin alternative antibiotic', 'category' => 'Antibiotics', 'requires_prescription' => true, 'price' => 14000],
 
@@ -128,9 +128,22 @@ class MedicineSeeder extends Seeder
             ['name' => 'Dexamethasone 0.5mg', 'description' => 'Strong corticosteroid', 'category' => 'Hormones', 'requires_prescription' => true, 'price' => 8000],
         ];
 
-        // Insert all medicines
+        // Loop through each medicine and create record with local image path
         foreach ($medicines as $medicine) {
-            Medicine::create($medicine);
+            // Build image filename: replace spaces and slashes with underscores, then add .jpg
+            // If your images are .png, change the extension below.
+            $imageName = str_replace([' ', '/'], '_', $medicine['name']) . '.jpg';
+            // Relative path from the public directory
+            $imagePath = 'medicine_photo/' . $imageName;
+
+            Medicine::create([
+                'name'                  => $medicine['name'],
+                'description'           => $medicine['description'],
+                'category'              => $medicine['category'],
+                'requires_prescription' => $medicine['requires_prescription'],
+                'price'                 => $medicine['price'],
+                'image'                 => $imagePath,   // stores e.g. "medicine_photo/Paracetamol_500mg.jpg"
+            ]);
         }
     }
 }
