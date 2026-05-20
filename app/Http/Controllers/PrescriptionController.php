@@ -19,6 +19,72 @@ class PrescriptionController extends Controller
     /**
      * Verify the digital signature of an electronic prescription
      */
+     public function upload(UploadPrescriptionRequest $request){
+        try{
+             $user=Auth::user();
+             
+             $validated=$request->validated();
+             $validated['user_id']=$user->id;
+              if (!$request->hasFile('file')) {
+                return response()->json(['message' => 'No file uploaded'], 400);
+            }
+               $path = $request->file('file')->store('prescriptions', 'public');
+               $validated['file'] = $path;
+
+            $missingMedicines = [];
+            $availableMedicines = [];
+             $text = $this->extractText($request->file('file'));
+            $lines = preg_split('/\r\n|\r|\n/', $text);
+
+            foreach ($lines as $line) {
+                $medicineName = trim($line);//
+                $medicine = Medicine::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($medicineName) . '%'])->first();
+
+
+                if (!$medicine) {
+                    $missingMedicines[] = $medicineName;
+                } else {
+                    $availableMedicines[] = $medicine;
+                }
+            }
+              if (empty($missingMedicines)) {
+                 $status = 'Approved';
+            } 
+            else {
+                $status = 'Rejected';
+                                     }
+
+            $validated['status'] = $status;
+              $prescription =Prescription::create($validated);
+                foreach ($availableMedicines as $medicine) {
+                 $medicineId = $medicine->id;
+                 $prescription->medicines()->attach($medicineId);
+            }
+             return response()->json([
+                'message' => 'Prescription uploaded successfully',
+                'status' => $status,
+                'available_medicines' => $availableMedicines,
+                'missing_medicines' => $missingMedicines
+                  ]);
+        }
+        catch(Exception $e){
+        return response()->json(['message'=>'Upload failed','error'=>$e->getMessage()],500);
+        }
+   }
+private function extractText($file)
+    {
+        $extension = $file->getClientOriginalExtension();
+
+        if ($extension === 'pdf') {
+            return \Spatie\PdfToText\Pdf::getText($file->getRealPath());
+        }
+        if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
+            $filePath = $file->getRealPath();
+
+            return (new TesseractOCR($filePath))->executable('C:\Users\Classic\AppData\Local\Programs\Tesseract-OCR\tesseract.exe')->lang('eng')->run();
+                }
+            return "Unsupported file type";
+    }
     private function verifyDigitalSignature($prescription)
     {
         if (!$prescription->digital_signature) {
