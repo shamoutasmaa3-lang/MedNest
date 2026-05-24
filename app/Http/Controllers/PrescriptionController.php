@@ -141,7 +141,6 @@ private function extractText($file)
                 ], 400);
             }
         }
-
         $prescription->pharmacist_id   = $pharmacist->id;
         $prescription->pharmacist_notes = $request->notes;
         $prescription->status           = $request->status;
