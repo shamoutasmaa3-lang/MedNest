@@ -11,14 +11,12 @@ use App\Services\DrugInteractionService;
 
 class SafetyCheckController extends Controller
 {
-   
-
     protected $interactionService;
+
     public function __construct(DrugInteractionService $interactionService)
     { 
         $this->interactionService = $interactionService; 
     }
-    
 
     public function check(Request $request, RecommendationService $service)
     {
@@ -34,6 +32,7 @@ class SafetyCheckController extends Controller
 
         $request->user()->notify(new SafetyCheckResult($hasSevere, $interactions));
 
+    
         foreach ($medicineIds as $id) {
             $medicine = Medicine::find($id);
 
@@ -50,7 +49,27 @@ class SafetyCheckController extends Controller
                 ]);
             }
         }
+        if ($hasSevere) {
 
+            foreach ($medicineIds as $id) {
+                $medicine = Medicine::find($id);
+
+                if ($medicine) {
+
+                    $alternatives = $service->suggestAlternatives($medicine);
+
+                    if (!empty($alternatives)) {
+                        Recommendation::create([
+                            'user_id' => $request->user()->id,
+                            'medicine_id' => $medicine->id,
+                            'type' => 'interaction-alternative',
+                            'message' => "Severe interaction detected. Suggested alternatives for {$medicine->name}:",
+                            'data' => ['alternatives' => $alternatives],
+                        ]);
+                    }
+                }
+            }
+        }
         return response()->json([
             'status' => $hasSevere ? 'danger' : 'safe',
             'message' => $hasSevere 

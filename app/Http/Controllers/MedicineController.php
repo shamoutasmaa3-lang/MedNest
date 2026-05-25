@@ -8,47 +8,58 @@ use Illuminate\Http\Request;
 class MedicineController extends Controller
 {
    
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'                  => 'required|string|max:80',
-            'description'           => 'nullable|string',
-            'price'                 => 'required|numeric',
-            'active_ingredient'     => 'nullable|string',
-            'manufacturer'          => 'nullable|string',
-            'category'              => 'nullable|string',
-            'requires_prescription' => 'required|boolean',
-            // ✅ NEW: expiration date and batch number
-            'expiration_date'       => 'nullable|date|after:today',
-            'batch_number'          => 'nullable|string|max:50',
-        ]);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name'                  => 'required|string|max:80',
+        'description'           => 'nullable|string',
+        'price'                 => 'required|numeric',
+        'active_ingredient'     => 'nullable|string',
+        'manufacturer'          => 'nullable|string',
+        'category'              => 'nullable|string',
+        'requires_prescription' => 'required|boolean',
+        'expiration_date'       => 'nullable|date|after:today',
+        'batch_number'          => 'nullable|string|max:50',
+        'image'                 => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
+    ]);
 
-        $medicine = Medicine::create($request->all());
-
-        return response()->json([
-            'message' => 'Medicine added successfully',
-            'data'    => $medicine,
-        ]);
+    if ($request->hasFile('image')) {
+        $validated['image'] = $request->file('image')->store('medicines', 'public');
     }
 
-    // عرض الأدوية + البحث
-    public function index(Request $request)
-    {
-        $query = Medicine::query();
+    $medicine = Medicine::create($validated);
 
-        // بحث بالاسم
-        if ($request->has('name')) {
-            $query->where('name', 'LIKE', '%' . $request->name . '%');
-        }
+    return response()->json([
+        'message' => 'Medicine added successfully',
+        'data'    => $medicine,
+    ]);
+}
 
-        // بحث بالفئة
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
-        }
 
-        return response()->json([
-            'status' => 'success',
-            'data'   => $query->orderBy('name')->get(),
-        ]);
+public function index(Request $request)
+{
+    $query = Medicine::query();
+
+    if ($request->filled('name')) {
+        $query->where('name', 'LIKE', '%' . $request->name . '%');
     }
+
+    if ($request->filled('category')) {
+        $query->where('category', $request->category);
+    }
+
+    $medicines = $query->orderBy('name')->get();
+
+    foreach ($medicines as $medicine) {
+        $medicine->image_url = $medicine->image
+            ? asset('storage/' . $medicine->image)
+            : null;
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'data'   => $medicines,
+    ]);
+}
+
 }

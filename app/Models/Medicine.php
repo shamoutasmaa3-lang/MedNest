@@ -10,15 +10,15 @@ class Medicine extends Model
     use HasFactory;
 
     protected $fillable = [
-    'name',
-    'description',
-    'category',
-    'requires_prescription',
-    'price',
-    'active_ingredient',
-    'manufacturer',
-    'image',  
-];
+        'name',
+        'description',
+        'category',
+        'requires_prescription',
+        'price',
+        'active_ingredient',
+        'manufacturer',
+        'image'
+    ];
 
     public function cart()
     {
