@@ -1,24 +1,55 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SafetyCheckController;
+use Illuminate\Http\Request;
+
+// Standard Controllers
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RecommendationController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\SafetyCheckController;
 
-// ==================== Public Routes (No Authentication) ====================
+// API Specific Controllers (Aliased to avoid name collision)
+use App\Http\Controllers\Api\MedicineController as ApiMedicineController;
+use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\MedicineController as WebMedicineController;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+Route::patch('/prescriptions/{id}/dispense', [PrescriptionController::class, 'dispense']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/prescriptions', [PrescriptionController::class, 'storeDoctorPrescription']);
+    // other existing routes...
+});
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 
-// ==================== Authenticated Routes (Require Token) ====================
+// Medicine search and show should generally be public so users can browse
+Route::prefix('v1')->group(function () {
+    Route::get('/medicines/search', [ApiMedicineController::class, 'search']);
+    Route::get('/medicines/{id}', [ApiMedicineController::class, 'show']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth:sanctum')->group(function () {
+
+    // V1 Group for Mobile/API specific logic
+    Route::prefix('v1')->group(function () {
+        Route::get('/patients/search', [PatientController::class, 'search']);
+    });
+
     // User management
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/logout', [UserController::class, 'logout']);
@@ -31,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/recommendations', [RecommendationController::class, 'index']);
     Route::post('/recommendations/{id}/read', [RecommendationController::class, 'markAsRead']);
 
-    // Notifications (using NotificationController)
+    // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::get('/notifications/unread', [NotificationController::class, 'unread']);
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
@@ -55,8 +86,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/patient/prescriptions', [PrescriptionController::class, 'patientPrescriptions']);
     Route::post('/prescriptions/upload', [PrescriptionController::class, 'upload']);
 
-    // Medicine show (patient)
-    Route::get('/medicines', [MedicineController::class, 'index']);
+    // General Medicine List (using the web controller version if intended)
+    Route::get('/medicines', [WebMedicineController::class, 'index']);
+
+    /* --- Role Based Routes --- */
 
     // Doctor-only routes
     Route::middleware('role:doctor')->group(function () {
@@ -75,12 +108,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/consultations/{id}/reply', [ConsultationController::class, 'reply']);
         Route::post('/pharmacist/prescriptions/{id}/review', [PrescriptionController::class, 'review']);
         Route::get('/pharmacist/prescriptions', [PrescriptionController::class, 'pharmacistPrescriptions']);
-        Route::post('/medicines', [MedicineController::class, 'store']);
-        // ✅ إضافة المسار الجديد للأدوية المنتهية صلاحيتها
         Route::get('/pharmacist/inventory/expiring', [InventoryController::class, 'expiringMedicines']);
+        
+        // This likely refers to adding new medicine records
+        Route::post('/medicines', [WebMedicineController::class, 'store']);
+        
+        // Signature verification
+        Route::get('/pharmacist/prescriptions/{id}/verify-signature', [PrescriptionController::class, 'verifyPrescriptionSignature']);
     });
-
-    // Signature verification for prescriptions (requires pharmacist, separate middleware)
-    Route::get('/pharmacist/prescriptions/{id}/verify-signature', [PrescriptionController::class, 'verifyPrescriptionSignature'])
-        ->middleware('auth:sanctum', 'role:pharmacist');
 });
