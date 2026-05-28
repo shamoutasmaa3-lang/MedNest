@@ -23,7 +23,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/logout', [UserController::class, 'logout']);
     Route::post('/logout-all', [UserController::class, 'logoutAll']);
+    Route::post('/profile/review', [UserController::class, 'reviewChanges']);
+    //Safety check
     Route::post('/safety-check', [SafetyCheckController::class, 'check']);
+    
+
 
     // Recommendations
     Route::get('/recommendations/usage', [OrderController::class, 'generateUsageRecommendations']);

@@ -77,4 +77,49 @@ class UserController extends Controller
         $request->user()->tokens()->delete();
         return response()->json(['message' => 'Logged out from all devices']);
     }
+    
+    public function reviewChanges(Request $request)
+{
+    $user = $request->user();
+
+    $changes = [];
+
+    if ($request->filled('name') && $request->name !== $user->name) {
+        $changes[] = [
+            'field' => 'name',
+            'old_value' => $user->name,
+            'new_value' => $request->name
+        ];
+    }
+
+    if ($request->filled('address') && $request->address !== $user->address) {
+        $changes[] = [
+            'field' => 'address',
+            'old_value' => $user->address,
+            'new_value' => $request->address
+        ];
+    }
+
+    if ($request->filled('email') && $request->email !== $user->email) {
+        $changes[] = [
+            'field' => 'email',
+            'old_value' => $user->email,
+            'new_value' => $request->email
+        ];
+    }
+
+    if ($request->filled('password')) {
+        $changes[] = [
+            'field' => 'password',
+            'old_value' => '********',
+            'new_value' => $request->password
+        ];
+    }
+
+    return response()->json([
+        'message' => 'Review of profile changes',
+        'changes' => $changes
+    ]);
+}
+
 }
