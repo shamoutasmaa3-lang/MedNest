@@ -77,6 +77,51 @@ class UserController extends Controller
         $request->user()->tokens()->delete();
         return response()->json(['message' => 'Logged out from all devices']);
     }
+    public function updateProfile(Request $request)
+{
+    $user = $request->user();
+
+    $request->validate([
+        'name' => 'sometimes|string|max:255',
+        'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+        'address' => 'sometimes|string|min:10',
+        'password' => [
+            'sometimes',
+            'string',
+            'min:10',
+            'confirmed',
+            'regex:/[a-z]/',      // حرف صغير
+            'regex:/[A-Z]/',      // حرف كبير
+            'regex:/[0-9]/',      // رقم
+            'regex:/[@$!%*#?&]/', // رمز خاص
+        ],
+    ]);
+
+    // تحديث الحقول إذا تم إرسالها
+    if ($request->filled('name')) {
+        $user->name = $request->name;
+    }
+
+    if ($request->filled('email')) {
+        $user->email = $request->email;
+    }
+
+    if ($request->filled('address')) {
+        $user->address = $request->address;
+    }
+
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
+    }
+
+    $user->save();
+
+    return response()->json([
+        'message' => 'Profile updated successfully',
+        'user' => $user
+    ], 200);
+}
+
     
     public function reviewChanges(Request $request)
 {

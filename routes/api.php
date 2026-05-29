@@ -26,7 +26,7 @@ use App\Http\Controllers\MedicineController as WebMedicineController;
 */
 Route::patch('/prescriptions/{id}/dispense', [PrescriptionController::class, 'dispense']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/prescriptions', [PrescriptionController::class, 'storeDoctorPrescription']);
+Route::post('/prescriptions', [PrescriptionController::class, 'storeDoctorPrescription']);
     // other existing routes...
 });
 Route::post('/register', [UserController::class, 'register']);
@@ -55,6 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [UserController::class, 'logout']);
     Route::post('/logout-all', [UserController::class, 'logoutAll']);
     Route::post('/profile/review', [UserController::class, 'reviewChanges']);
+    Route::patch('/user/update', [UserController::class, 'updateProfile']);
+
     //Safety check
     Route::post('/safety-check', [SafetyCheckController::class, 'check']);
     
