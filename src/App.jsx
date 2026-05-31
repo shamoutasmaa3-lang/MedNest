@@ -1,4 +1,3 @@
-
 import { Routes, Route } from "react-router-dom";
 
 import Login from "./Login";
@@ -14,20 +13,23 @@ import Inventory from "./Inventory";
 import PharmacistChat from "./PharmacistChat";
 import Notification from "./Notification";
 import MyOrders from "./MyOrders";
+import PatientChat from "./PatientChat";
 
 import RoleRoute from "./RoleRoute";
 import DoctorHome from "./DoctorHome";
 import PharmacistHome from "./PharmacistHome";
 import PharmacistOrders from "./PharmacistOrders";
 import PharmacistNotifications from "./PharmacistNotification";
+import Recommendations from "./Recommendations";
+import PrescriptionPage from "./DigitalPrescription";
+
 export default function App() {
   return (
     <Routes>
 
-   
+      {/* ------ Auth ------ */}
       <Route path="/" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
-
 
       {/* ------ Patient Routes ------ */}
       <Route
@@ -74,14 +76,23 @@ export default function App() {
           </RoleRoute>
         }
       />
-          {/* <Route
-        path="/profile"
-        element={
-          <RoleRoute allowedRoles={["patient"]}>
-            <Profile />
-          </RoleRoute>
-        }
-      /> */}
+
+<Route
+  path="/recommendations"
+  element={
+    <RoleRoute allowedRoles={["patient"]}>
+      <Recommendations />
+    </RoleRoute>
+  }
+/>
+<Route
+  path="/patientChat"
+  element={
+    <RoleRoute allowedRoles={["patient"]}>
+      <PatientChat />
+    </RoleRoute>
+  }
+/>
 
       <Route
         path="/safe"
@@ -101,8 +112,7 @@ export default function App() {
         }
       />
 
-
-      {/* ------ Shared Routes (all roles) ------ */}
+      {/* ------ Shared Routes ------ */}
       <Route
         path="/profile"
         element={
@@ -121,7 +131,7 @@ export default function App() {
         }
       />
 
-
+      {/* ------ Pharmacist ------ */}
       <Route
         path="/pharmacist"
         element={
@@ -139,6 +149,7 @@ export default function App() {
           </RoleRoute>
         }
       />
+
       <Route
         path="/pharmacistnotifaction"
         element={
@@ -156,6 +167,7 @@ export default function App() {
           </RoleRoute>
         }
       />
+
       <Route
         path="/pharmacistorders"
         element={
@@ -165,8 +177,7 @@ export default function App() {
         }
       />
 
-
-    
+      {/* ------ Doctor ------ */}
       <Route
         path="/doctor"
         element={
@@ -176,7 +187,16 @@ export default function App() {
         }
       />
 
+      {/* ✅ NEW: Doctor Prescriptions Page */}
+      <Route
+        path="/doctor/prescriptions"
+        element={
+          <RoleRoute allowedRoles={["doctor"]}>
+            <PrescriptionPage />
+          </RoleRoute>
+        }
+      />
+
     </Routes>
   );
-
 }

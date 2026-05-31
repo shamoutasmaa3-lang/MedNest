@@ -195,10 +195,7 @@ export default function SideBar() {
             <i className="fa-solid fa-circle-user icon"></i>
             <span>Profile</span>
           </Link>
-          <Link to="/profile" className="item">
-            <i className="fa-solid fa-circle-user icon"></i>
-            <span>Profile</span>
-          </Link>
+          
         </>
       )}
     </div>
