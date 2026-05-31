@@ -1,0 +1,139 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  /* Main Page */
+  .recommendations-page {
+    padding: 35px;
+    margin-left: 100px;
+    min-height: 100vh;
+    background: #eef3fb;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Header */
+  .recommendations-header {
+    margin-bottom: 30px;
+  }
+  
+  .recommendations-header h1 {
+    color: #1b3c74;
+    font-size: 42px;
+    font-weight: 700;
+  }
+  
+  .recommendations-header p {
+    color: #5f76a3;
+    font-size: 17px;
+    margin-top: 6px;
+  }
+  
+  /* Container */
+  .recommendations-container {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  
+  /* Sections */
+  .recommendation-section {
+    background: white;
+    padding: 24px;
+    border-radius: 24px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.04);
+  }
+  
+  .recommendation-section h2 {
+    color: #1e3d7b;
+    margin-bottom: 20px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  
+  /* Cards */
+  .recommendation-card {
+    background: #dce8f8;
+  
+    padding: 18px 22px;
+    border-radius: 18px;
+  
+    margin-bottom: 14px;
+  
+    transition: 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .recommendation-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  /* Card Titles */
+  .recommendation-card h3 {
+    color: #1b3c74;
+    margin-bottom: 8px;
+    font-size: 18px;
+  }
+  
+  /* Card Text */
+  .recommendation-card p {
+    color: #43577e;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  
+  /* Usage Cards */
+  .usage-card {
+    background: #d9f2e6;
+  }
+  
+  /* Dosage Cards */
+  .dosage-card {
+    background: #fff0d9;
+  }
+  
+  /* Empty State */
+  .empty {
+    text-align: center;
+    color: #93a0b8;
+    padding: 30px 0;
+    font-size: 16px;
+  }
+  
+  /* Scroll */
+  .recommendations-page::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .recommendations-page::-webkit-scrollbar-thumb {
+    background: #c3d4ef;
+    border-radius: 10px;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+  
+    .recommendations-page {
+      margin-left: 0;
+      padding: 20px;
+    }
+  
+    .recommendations-header h1 {
+      font-size: 30px;
+    }
+  
+    .recommendation-section {
+      padding: 18px;
+    }
+  
+    .recommendation-section h2 {
+      font-size: 22px;
+    }
+  
+    .recommendation-card {
+      padding: 16px;
+    }
+  }

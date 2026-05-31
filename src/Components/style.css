@@ -1,0 +1,160 @@
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 105px;
+  height: 100vh;
+  background: #d9e3ed;
+  border-right: 1px solid #bbd6f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-top: 1px;
+  gap: 4px;
+
+  box-shadow: 3px 0 15px rgba(0, 0, 50, 0.05);
+  z-index: 2000;
+}
+
+.sidebar .item {
+  text-decoration: none;
+  color: #042380;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: 0.25s ease;
+  background-color:#d9e3ed ;
+  
+}
+
+.sidebar .icon {
+
+  font-size: 28px;
+  margin-bottom: 4px;
+
+  background-color:#d9e3ed ;
+}
+
+.sidebar .item span {
+  font-size: 15px;
+  font-weight: 500;
+  color:#6a80c2;
+  background-color:#d9e3ed ;
+  font-family: "Intro",sans-serif;
+
+}
+
+.sidebar .item:hover {
+  background-color: #d9e3ed;
+  transform:translateY(-4px);
+  transition:all 0.1s ease;
+ 
+} 
+.noti-item {
+  position: relative;
+}
+
+/* النقطة/العدد */
+.noti-badge {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  background: red;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.Header {
+  position: fixed;
+  top: 0;
+  left: 95px;
+  width: calc(100% - 95px);
+  min-height: 130px;
+  padding: 15px 25px;
+  background: white;
+  box-shadow: 0 0px 25px #7f9eef;
+  display: flex;
+  flex-direction: column;
+   gap: 12px; 
+    z-index: 1500;
+}
+
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.icon {
+  font-size: 40px;
+  color: #1b3b6f;
+}
+
+.title-text h1 {
+  font-size: 30px;
+  color: #1b3b6f;
+  font-weight: bold;
+  
+}
+
+.title-text h4 {
+  font-size: 15px;
+  color: #6a80c2;
+  font-weight: normal;
+}
+
+
+.ask-search-row {
+  display: flex;
+  align-items: center;   
+  justify-content: flex-start;
+  gap: 15px;
+  margin-top: 0px;      
+}
+
+
+.ask-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1b3b6f;
+  white-space: nowrap;
+  margin-top: 0;        
+}
+
+
+.search-box input {
+  width: 320px;
+  padding: 10px 12px;
+  border: 2px solid #1b3b6f;
+  border-radius: 20px;
+  outline: none;
+}
+
+.search-box input:focus {
+  box-shadow: 0 0 8px rgba(27, 59, 111, 0.15);
+}
+
+.logo img {
+  width: 70px; 
+  height: auto;
+  object-fit: contain;
+}
