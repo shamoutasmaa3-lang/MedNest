@@ -14,8 +14,9 @@ use App\Models\Recommendation;
 use App\Models\Stock;
 use App\Models\User;
 use App\Notifications\LowStockAlert;
+use App\Notifications\NewOrderPlaced;
 use App\Services\RecommendationService;
-
+use Illuminate\Support\Facades\Notification;
 
 class OrderController extends Controller
 {
@@ -73,6 +74,11 @@ class OrderController extends Controller
             Cart::where('user_id', $userId)->delete();
 
             DB::commit();
+            
+           Notification::send( User::where('role', 'pharmacist')->get(),
+            new NewOrderPlaced($order, Auth::user()));
+
+
 
             return response()->json([
                 'status' => 'success',
