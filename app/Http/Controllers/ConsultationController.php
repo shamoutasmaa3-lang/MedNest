@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class ConsultationController extends Controller
 {
-    public function createConsultation(Request $request)
+public function createConsultation(Request $request)
 {
     $request->validate([
         'subject' => 'required|string|max:255',
@@ -20,9 +20,11 @@ class ConsultationController extends Controller
     $consultation = Consultation::create([
         'patient_id' => $request->user()->id,
         'subject' => $request->subject,
+        'status' => 'pending',
+        'pharmacist_id' => null,
     ]);
 
-      ConsultationMessage::create([
+    ConsultationMessage::create([
         'consultation_id' => $consultation->id,
         'sender_id' => $request->user()->id,
         'message' => $request->message,
@@ -33,6 +35,7 @@ class ConsultationController extends Controller
         'consultation' => $consultation,
     ]);
 }
+
 public function patientConsultations(Request $request)
 {
     $consultations = Consultation::where('patient_id', $request->user()->id)
@@ -84,16 +87,43 @@ public function pharmacistConsultations(Request $request)
     if ($request->user()->role !== 'pharmacist') {
         return response()->json(['error' => 'Unauthorized'], 403);
     }
-    $consultations = Consultation::whereNull('pharmacist_id')
-        ->orWhere('pharmacist_id', $request->user()->id)
-        ->with('messages')
-        ->latest()
-        ->get();
+
+    $consultations = Consultation::where(function ($q) use ($request) {
+        $q->whereNull('pharmacist_id')
+          ->orWhere('pharmacist_id', $request->user()->id);
+    })
+    ->with('messages')
+    ->latest()
+    ->get();
 
     return response()->json([
         'status' => 'success',
         'data' => $consultations
     ]);
 }
+public function sendMessage(Request $request, $id)
+{
+    $request->validate([
+        'message' => 'required|string',
+    ]);
+
+    $consultation = Consultation::findOrFail($id);
+
+    ConsultationMessage::create([
+        'consultation_id' => $consultation->id,
+        'sender_id' => $request->user()->id,
+        'message' => $request->message,
+    ]);
+
+    $consultation->update([
+        'status' => 'pending'
+    ]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Message sent'
+    ]);
+}
+
 
 }

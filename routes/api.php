@@ -75,8 +75,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 
     // Consultations
-    Route::post('/consultations', [ConsultationController::class, 'createConsultation']);
-    Route::get('/consultations', [ConsultationController::class, 'patientConsultations']);
+    
+   Route::post('/consultations', [ConsultationController::class, 'createConsultation'])->middleware('auth:sanctum');
+   Route::get('/consultations/patient', [ConsultationController::class, 'patientConsultations'])->middleware('auth:sanctum');
+   Route::post('/consultations/{id}/message', [ConsultationController::class, 'sendMessage']);
 
     // Cart management
     Route::get('/cart', [CartController::class, 'index']);

@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id();
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
         $table->decimal('total_price', 10, 2);
-        $table->enum('status', ['pending', 'verified', 'dispensed', 'shipped', 'delivered', 'cancelled'])->default('pending');
+        $table->enum('status', ['pending', 'verified', 'dispensed', 'shipped', 'delivered', 'cancelled','rejected'])->default('pending');
         $table->string('delivery_address')->nullable();
         $table->enum('payment_method', ['cash', 'card', 'online'])->default('cash');
         $table->text('notes')->nullable();
