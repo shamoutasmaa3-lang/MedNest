@@ -1,0 +1,269 @@
+body {
+  margin: 0;
+  background: #eef3fb;
+}
+
+
+.layout {
+  display: flex;
+}
+
+
+.profile-page {
+  margin-left: 100px;
+  flex: 1;
+  padding: 30px;
+}
+
+
+.profile-page h1,
+.profile-page .subtitle {
+  color: #1B3C74;
+}
+
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+
+.card {
+  background: #f6f7fb;
+  padding: 20px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profile-card .avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ddd;
+  margin: 0 auto;
+}
+
+.profile-card h2,
+.profile-card .email,
+.profile-card .role {
+  text-align: center;
+}
+
+.profile-card hr {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 15px 0;
+}
+
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1b3b6f;
+  font-size: 14px;
+}
+
+.info-item img {
+  width: 20px;
+  height: 20px;
+}
+
+
+.email {
+  color: gray;
+}
+
+.role {
+  padding: 5px 15px;
+  border: 1px solid #1f3b73;
+  border-radius: 20px;
+}
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.card-title img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.card-title h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #1b3b6f;
+}
+
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+  outline: none;
+  background: #f4f6fb;
+  color: #6b7a99;
+}
+
+input::placeholder {
+  color: #a0aec0;
+}
+
+
+.edit-btn,
+.save-btn {
+  padding: 8px 18px;
+  font-size: 13px;
+  border-radius: 12px;
+  background: #d9e3f5;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+  align-self: center;
+  color: #1b3b6f;
+  font-weight: 500;
+}
+
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.right-column .card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1B3C74;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.right-column .card h3 img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle {
+  width: 50px;
+  height: 25px;
+  border-radius: 20px;
+  background: #ccc;
+  position: relative;
+  transition: 0.3s ease;
+}
+
+.toggle::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  transition: 0.3s ease;
+}
+
+.toggle.active {
+  background: #1f3b73;
+}
+
+.toggle.active::after {
+  left: 25px;
+}
+
+.toggle-row:hover {
+  background: rgba(27, 59, 111, 0.05);
+  border-radius: 10px;
+}
+
+
+.logout {
+  color: #1B3C74;
+  margin-top: 30px;
+  background: #d9e3f5;
+  padding: 12px 18px;
+  border-radius: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  cursor: pointer;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logout img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+
+@media (max-width: 1000px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page {
+    margin-left: 100px;
+  }
+}

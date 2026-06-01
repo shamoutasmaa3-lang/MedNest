@@ -1,0 +1,153 @@
+
+.prescription-container {
+  margin-left: 95px;
+  padding: 50px;
+  background: #f2f3f6;
+  min-height: 100vh;
+}
+
+
+.upload-section {
+  width: 50%;
+}
+
+.upload-section h2 {
+  color: #1e2f55;
+  margin-bottom: 25px;
+  font-size: 40px; 
+  font-weight: 800;
+}
+
+
+.upload-box {
+  border: 3px dashed #5c85ff;
+  border-radius: 25px;
+  height: 250px; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #1e2f55;
+  background: #e6edff;
+  text-align: center;
+  font-size: 20px;
+  width:80%;
+  margin-left: 45px;
+}
+
+.upload-box span {
+  color: #345dff;
+  font-weight: bold;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+
+.upload-btn {
+  margin-top: 30px;
+  margin-left: 75px;
+  background: #2b4c7e;
+  color: white;
+  padding: 15px 45px;
+  font-size: 20px;
+  border-radius: 25px;
+  border: none;
+  width: 60%;
+
+ 
+ 
+}
+
+.upload-btn:hover {
+  background: #28384f;
+}
+
+
+.formats {
+  margin-top: 15px;
+    margin-left: 100px;
+  color: #666;
+  font-size: 17px;
+}
+
+
+.success,
+.nosuccess{
+  margin-top: 34px;
+   margin-left: 45px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+}
+
+.success {
+  color: #1f5c2e;
+}
+
+.nosuccess {
+  color: #d60000; 
+  font-weight: bold;
+
+}
+
+
+.result-section {
+  position: absolute;
+  right: 60px;
+  top: 170px;
+  margin-right: 100px;
+}
+
+.result-card {
+  width: 300px;
+  height: 170px;
+  
+  background: #e6edff;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+
+.order-btn {
+  margin-top: 25px;
+  width: 60%;
+  padding: 15px;
+  background: #2b4c7e;
+  color: white;
+  border-radius: 30px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  margin-left:40px
+}
+.order-btn:hover {
+  background: #28384f;
+}
+
+.features {
+  margin-top: 80px;
+  display: flex;
+  justify-content: space-around;
+  background: #dbe3f7;
+  padding: 30px;
+  border-radius: 25px;
+
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: white;
+  padding: 15px 25px; 
+  border-radius: 18px;
+  color: #2b3c6b;
+  font-weight: 600;
+  font-size: 25px;
+}

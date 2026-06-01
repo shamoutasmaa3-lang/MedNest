@@ -1,0 +1,96 @@
+.Contener {
+  margin-top: 200px;
+  margin-left: 115px;
+  padding: 50px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 35px;
+  
+}
+
+.product {
+  background-color: #d4dff2;
+  border-radius: 20px;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  transition: 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 40, 0.06);
+  width: 70%;
+  height: 110%;
+}
+
+.product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0, 0, 40, 0.12);
+}
+
+.product img {
+  width: 140px;
+  height: 130px;
+  object-fit: contain;
+}
+
+.info h2 {
+  color: #233a78;
+  font-size: 21px;
+  margin-bottom: 8px;
+  
+}
+
+.info p {
+  color: #444;
+  font-size: 22px;
+  margin-bottom: 6px;
+  
+}
+p strong {
+  background-color: #d4dff2;
+}
+.info button {
+  margin-top: 12px;
+  padding: 9px 24px;
+  background: #5c7ce2;
+  border: none;
+  border-radius: 25px;
+  color: #f4f1f1;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+  font-size: 18px;
+}
+
+.info button:hover {
+  background: #3f5fd3;
+}
+.add-product {
+  border: 2px dashed #4a6fb3;
+  background: #f5f7ff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  transition: 0.3s;
+}
+
+.add-product:hover {
+  transform: scale(1.03);
+  background: #e8eeff;
+}
+
+
+
+
+.add-box {
+  text-align: center;
+  width: 100%;
+}
+
+.plus {
+  font-size: 60px;
+  font-weight: bold;
+  color: #4a6fb3;
+  margin-bottom: 10px;
+}
