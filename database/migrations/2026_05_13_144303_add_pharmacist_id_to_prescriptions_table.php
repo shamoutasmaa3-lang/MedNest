@@ -8,15 +8,19 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('prescriptions', function (Blueprint $table) {
-            $table->foreignId('pharmacist_id')->nullable()->after('patient_id')->constrained('users')->nullOnDelete();
-        });
+        if (!Schema::hasColumn('prescriptions', 'pharmacist_id')) {
+            Schema::table('prescriptions', function (Blueprint $table) {
+                $table->foreignId('pharmacist_id')->nullable()->after('patient_id')->constrained('users')->nullOnDelete();
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('prescriptions', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('pharmacist_id');
-        });
+        if (Schema::hasColumn('prescriptions', 'pharmacist_id')) {
+            Schema::table('prescriptions', function (Blueprint $table) {
+                $table->dropConstrainedForeignId('pharmacist_id');
+            });
+        }
     }
 };

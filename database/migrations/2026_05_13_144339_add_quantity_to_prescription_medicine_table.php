@@ -8,15 +8,19 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('prescription_medicine', function (Blueprint $table) {
-            $table->integer('quantity')->default(1)->after('duration');
-        });
+        if (!Schema::hasColumn('prescription_medicine', 'quantity')) {
+            Schema::table('prescription_medicine', function (Blueprint $table) {
+                $table->integer('quantity')->default(1)->after('duration');
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('prescription_medicine', function (Blueprint $table) {
-            $table->dropColumn('quantity');
-        });
+        if (Schema::hasColumn('prescription_medicine', 'quantity')) {
+            Schema::table('prescription_medicine', function (Blueprint $table) {
+                $table->dropColumn('quantity');
+            });
+        }
     }
 };

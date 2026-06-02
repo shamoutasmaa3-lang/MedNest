@@ -23,18 +23,20 @@ class MedicineController extends Controller
     }
 
     /**
-     * Search for medicines by name or category.
+     * Search for medicines by name, category, or description.
      */
     public function search(Request $request): JsonResponse
     {
         $request->validate([
-            'query' => 'required|string|min:2'
+            'query' => 'required|string|min:1'
         ]);
 
         $query = $request->input('query');
 
         $medicines = Medicine::where('name', 'like', '%' . $query . '%')
             ->orWhere('category', 'like', '%' . $query . '%')
+            ->orWhere('description', 'like', '%' . $query . '%')
+            ->orWhere('active_ingredient', 'like', '%' . $query . '%')
             ->limit(30)
             ->get([
                 'id',
@@ -42,12 +44,15 @@ class MedicineController extends Controller
                 'category',
                 'price',
                 'requires_prescription',
-                'image'
+                'image',
+                'description',
+                'active_ingredient',
             ]);
 
         return response()->json([
             'success' => true,
-            'data' => $medicines
+            'count'   => $medicines->count(),
+            'data'    => $medicines
         ]);
     }
 }
