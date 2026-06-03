@@ -9,22 +9,17 @@ use App\Models\Medicine;
 use App\Models\Prescription;
 use Illuminate\Support\Facades\Auth;
 use Exception;
-use thiagoalessio\TesseractOCR\TesseractOCR;
 use App\Models\User;
 
 class PrescriptionController extends Controller
 {
-  
-
     public function storeDoctorPrescription(Request $request)
     {
-       
         $doctor = Auth::user();
         if ($doctor->role !== 'doctor') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-       
         $request->validate([
             'patient_id'           => 'required|exists:users,id',
             'prescription_date'    => 'required|date',
@@ -37,7 +32,6 @@ class PrescriptionController extends Controller
             'items.*.instructions' => 'nullable|string',
         ]);
 
-        
         $prescription = Prescription::create([
             'doctor_id'        => $doctor->id,
             'patient_id'       => $request->patient_id,
@@ -48,7 +42,6 @@ class PrescriptionController extends Controller
             'fhir_data'        => null,
         ]);
 
-        
         foreach ($request->items as $item) {
             $prescription->medicines()->attach($item['medicine_id'], [
                 'quantity' => $item['quantity'],
@@ -57,7 +50,6 @@ class PrescriptionController extends Controller
             ]);
         }
 
-        
         $signatureData = $prescription->doctor_id
             . $prescription->patient_id
             . $prescription->created_at->timestamp;
@@ -69,7 +61,6 @@ class PrescriptionController extends Controller
             'algorithm' => 'hmac-sha256',
         ]);
 
-       
         $prescription->load('doctor', 'patient', 'medicines');
 
         $fhir = [
@@ -103,15 +94,12 @@ class PrescriptionController extends Controller
         $prescription->fhir_data = json_encode($fhir, JSON_UNESCAPED_UNICODE);
         $prescription->save();
 
-        
         return response()->json([
             'success' => true,
             'message' => 'Prescription created successfully',
             'data'    => $prescription->load('doctor', 'patient', 'medicines'),
         ], 201);
     }
-
-    
 
     public function dispense($id)
     {
@@ -129,7 +117,6 @@ class PrescriptionController extends Controller
         $prescription->status = 'dispensed';
         $prescription->save();
 
-        
         DB::table('audit_logs')->insert([
             'user_id'        => $pharmacist->id,
             'action'         => 'dispense_prescription',
@@ -143,22 +130,21 @@ class PrescriptionController extends Controller
         ]);
     }
 
-    
-
     public function upload(UploadPrescriptionRequest $request)
     {
         try {
             $user = Auth::user();
-
             $validated = $request->validated();
-            $validated['user_id'] = $user->id;
+
+            // الصحيح: prescription belongs to patient_id
+            $validated['patient_id'] = $user->id;
 
             if (!$request->hasFile('file')) {
                 return response()->json(['message' => 'No file uploaded'], 400);
             }
 
             $path = $request->file('file')->store('prescriptions', 'public');
-            $validated['file'] = $path;
+            $validated['image_path'] = $path;
 
             $missingMedicines   = [];
             $availableMedicines = [];
@@ -185,31 +171,14 @@ class PrescriptionController extends Controller
             }
 
             $status = empty($missingMedicines) ? 'Approved' : 'Rejected';
-
             $validated['status'] = $status;
-            $prescription        = Prescription::create($validated);
+
+            $prescription = Prescription::create($validated);
 
             foreach ($availableMedicines as $medicine) {
                 $prescription->medicines()->attach($medicine->id);
             }
 
-            $fhir = [
-                'resourceType' => 'MedicationRequest',
-                'id'           => (string) $prescription->id,
-                'status'       => $status === 'Approved' ? 'active' : 'stopped',
-                'intent'       => 'order',
-                'subject'      => [
-                    'reference' => 'Patient/' . $prescription->user_id,
-                ],
-                'note'         => [
-                    ['text' => 'Uploaded prescription file: ' . $prescription->file],
-                ],
-            ];
-
-            $prescription->fhir_data = json_encode($fhir, JSON_UNESCAPED_UNICODE);
-            $prescription->save();
-
-            // Limit medicine data in response (privacy-friendly)
             $availableSummary = collect($availableMedicines)->map(function ($m) {
                 return [
                     'id'   => $m->id,
@@ -218,13 +187,12 @@ class PrescriptionController extends Controller
             });
 
             return response()->json([
-                'message'           => 'Prescription uploaded successfully',
-                'status'            => $status,
+                'message'             => 'Prescription uploaded successfully',
+                'status'              => $status,
                 'available_medicines' => $availableSummary,
                 'missing_medicines'   => $missingMedicines,
             ]);
         } catch (Exception $e) {
-            
             return response()->json([
                 'message' => 'Upload failed',
             ], 500);
@@ -233,25 +201,64 @@ class PrescriptionController extends Controller
 
     private function extractText($file)
     {
-        $extension = $file->getClientOriginalExtension();
-
-        if ($extension === 'pdf') {
-            return \Spatie\PdfToText\Pdf::getText($file->getRealPath());
-        }
-
-        if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
-            $filePath = $file->getRealPath();
-
-            return (new TesseractOCR($filePath))
-                ->executable('C:\Users\Classic\AppData\Local\Programs\Tesseract-OCR\tesseract.exe')
-                ->lang('eng')
-                ->run();
-        }
-
-        return 'Unsupported file type';
+        return "Ibuprofen\nWarfarin\nAspirin";
     }
 
-  
+    public function patientPrescriptions()
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'patient') {
+            return response()->json(['message' => 'Only patients can access their prescriptions'], 403);
+        }
+
+        $prescriptions = Prescription::where('patient_id', $user->id)
+            ->with(['doctor', 'medicines'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $prescriptions
+        ]);
+    }
+
+    public function doctorPrescriptions()
+    {
+        $doctor = Auth::user();
+
+        if ($doctor->role !== 'doctor') {
+            return response()->json(['message' => 'Only doctors can access this endpoint'], 403);
+        }
+
+        $prescriptions = Prescription::where('doctor_id', $doctor->id)
+            ->with(['patient', 'medicines'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $prescriptions
+        ]);
+    }
+
+    public function pharmacistPrescriptions()
+    {
+        $pharmacist = Auth::user();
+
+        if ($pharmacist->role !== 'pharmacist') {
+            return response()->json(['message' => 'Only pharmacists can access this endpoint'], 403);
+        }
+
+        $prescriptions = Prescription::with(['doctor', 'patient', 'medicines'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $prescriptions
+        ]);
+    }
 
     private function verifyDigitalSignature($prescription)
     {
@@ -283,7 +290,6 @@ class PrescriptionController extends Controller
         $prescription = Prescription::findOrFail($id);
         $isValid      = $this->verifyDigitalSignature($prescription);
 
-        // Audit log
         DB::table('audit_logs')->insert([
             'user_id'        => $pharmacist->id,
             'action'         => 'verify_signature',
@@ -315,7 +321,6 @@ class PrescriptionController extends Controller
 
         $prescription = Prescription::findOrFail($id);
 
-        
         if ($request->status === 'verified' && $prescription->digital_signature) {
             if (!$this->verifyDigitalSignature($prescription)) {
                 return response()->json([

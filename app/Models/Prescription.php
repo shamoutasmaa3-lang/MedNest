@@ -10,17 +10,15 @@ class Prescription extends Model
     use HasFactory;
 
     protected $fillable = [
-        'doctor_id',
-        'patient_id',
-        'pharmacist_id',
-        'image_path',
-        'digital_signature',
-        'status',
-        'pharmacist_notes',
-        'review_date',
-        'fhir_data',
-    ];
-
+    'doctor_id',
+    'patient_id',
+    'status',
+    'image_path',
+    'pharmacist_notes',
+    'review_date',
+    'fhir_data',
+    'digital_signature',
+];
     protected $casts = [
         'fhir_data'   => 'array',
         'review_date' => 'datetime',
