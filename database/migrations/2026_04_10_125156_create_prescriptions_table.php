@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'verified', 'rejected', 'dispensed'])->default('pending');
             $table->text('pharmacist_notes')->nullable();
             $table->timestamp('review_date')->nullable();
-            $table->json('fhir_data')->nullable(); // ← شلنا after
+            $table->json('fhir_data')->nullable();
             $table->timestamps();
         });
     }

@@ -10,6 +10,7 @@ use App\Models\Prescription;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use App\Models\User;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 class PrescriptionController extends Controller
 {
@@ -136,7 +137,7 @@ class PrescriptionController extends Controller
             $user = Auth::user();
             $validated = $request->validated();
 
-            // الصحيح: prescription belongs to patient_id
+           
             $validated['patient_id'] = $user->id;
 
             if (!$request->hasFile('file')) {
@@ -201,8 +202,25 @@ class PrescriptionController extends Controller
 
     private function extractText($file)
     {
-        return "Ibuprofen\nWarfarin\nAspirin";
+        $extension = $file->getClientOriginalExtension();
+        $filePath = $file->getRealPath();
+
+        if ($extension === 'pdf') {
+            
+            return \Spatie\PdfToText\Pdf::getText($filePath);
+        }
+
+        if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
+            
+            return (new TesseractOCR($filePath))
+                ->executable('C:\Users\Classic\AppData\Local\Programs\Tesseract-OCR\tesseract.exe')  
+                ->lang('eng')
+                ->run();
+        }
+
+        throw new \Exception("Unsupported file type");
     }
+    
 
     public function patientPrescriptions()
     {

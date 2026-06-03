@@ -117,7 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/pharmacist/prescriptions/{id}/review', [PrescriptionController::class, 'review']);
         Route::get('/pharmacist/prescriptions', [PrescriptionController::class, 'pharmacistPrescriptions']);
         Route::get('/pharmacist/inventory/expiring', [InventoryController::class, 'expiringMedicines']);
-        
+        Route::patch('/prescriptions/{id}/dispense', [PrescriptionController::class, 'dispense']);
         // This likely refers to adding new medicine records
         Route::post('/medicines', [WebMedicineController::class, 'store']);
         
