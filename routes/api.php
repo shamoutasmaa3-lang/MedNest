@@ -16,7 +16,6 @@ use App\Http\Controllers\SafetyCheckController;
 
 // API Specific Controllers (Aliased to avoid name collision)
 use App\Http\Controllers\Api\MedicineController as ApiMedicineController;
-use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\MedicineController as WebMedicineController;
 
 /*
@@ -37,6 +36,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/medicines/search', [ApiMedicineController::class, 'search']);
     Route::get('/medicines/{id}', [ApiMedicineController::class, 'show']);
 });
+Route::get('/medicines', [ApiMedicineController::class, 'requirePrescription']);
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // V1 Group for Mobile/API specific logic
     Route::prefix('v1')->group(function () {
-        Route::get('/patients/search', [PatientController::class, 'search']);
+        Route::get('/patients/search', [UserController::class, 'search']);
     });
 
     // User management

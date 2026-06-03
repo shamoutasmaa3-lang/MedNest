@@ -62,4 +62,15 @@ public function index(Request $request)
     ]);
 }
 
+public function requirePrescription(Request $request)
+{
+    $query = Medicine::query();
+
+    if ($request->has('requires_prescription')) {
+        $query->where('requires_prescription', $request->requires_prescription);
+    }
+
+    return response()->json($query->get());
+}
+
 }
