@@ -20,6 +20,7 @@ class SafetyCheckController extends Controller
 
     public function check(Request $request, RecommendationService $service)
     {
+      
         $request->validate([
             'medicine_ids' => 'required|array|min:1',
             'medicine_ids.*' => 'exists:medicines,id'
@@ -27,12 +28,14 @@ class SafetyCheckController extends Controller
 
         $medicineIds = $request->medicine_ids;
 
+   
         $interactions = $this->interactionService->checkInteractions($medicineIds);
         $hasSevere = $this->interactionService->hasSevereInteraction($medicineIds);
 
+      
         $request->user()->notify(new SafetyCheckResult($hasSevere, $interactions));
 
-    
+       
         foreach ($medicineIds as $id) {
             $medicine = Medicine::find($id);
 
@@ -49,6 +52,8 @@ class SafetyCheckController extends Controller
                 ]);
             }
         }
+
+        
         if ($hasSevere) {
 
             foreach ($medicineIds as $id) {
@@ -56,7 +61,7 @@ class SafetyCheckController extends Controller
 
                 if ($medicine) {
 
-                    $alternatives = $service->suggestAlternatives($medicine);
+                    $alternatives = $service->suggestAlternativesByInteractions($medicine);
 
                     if (!empty($alternatives)) {
                         Recommendation::create([

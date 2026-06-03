@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\DrugInteraction;
 use App\Models\Medicine;
 use App\Models\Order;
 use App\Models\User;
@@ -60,4 +61,20 @@ class RecommendationService
             })
             ->values();
     }
+    public function suggestAlternativesByInteractions(Medicine $medicine, $limit = 3)
+    {
+
+     $interactingIds = DrugInteraction::where('medicine_id_1', $medicine->id)
+        ->orWhere('medicine_id_2', $medicine->id)
+        ->pluck('medicine_id_1', 'medicine_id_2')
+        ->flatten()
+        ->unique();
+
+    
+     return Medicine::where('id', '!=', $medicine->id)
+        ->whereNotIn('id', $interactingIds)
+        ->take($limit)
+        ->get();
+    }
+
 }
